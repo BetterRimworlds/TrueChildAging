@@ -64,7 +64,15 @@ internal static class AgeTrackerAccess
             settings.ChildAgingFactor,
             tracker.AgeBiologicalYearsFloat,
             tracker.AgeBiologicalTicks,
-            tracker.AgeChronologicalTicks);
+            tracker.AgeChronologicalTicks,
+            LifeStageMinTicks(tracker));
+    }
+
+    internal static long LifeStageMinTicks(Pawn_AgeTracker tracker)
+    {
+        LifeStageAge stage = tracker?.CurLifeStageRace;
+        float minAge = stage != null ? stage.minAge : 0f;
+        return BiologicalTickCorrection.LifeStageFloorTicks(minAge);
     }
 
     internal static void SyncGrowthToBiologicalAge(Pawn_AgeTracker tracker)
@@ -137,6 +145,7 @@ internal static class Patch_BiologicalTicksPerTick
         float biologicalYears = __instance.AgeBiologicalYearsFloat;
         long biologicalTicks = __instance.AgeBiologicalTicks;
         long chronologicalTicks = __instance.AgeChronologicalTicks;
+        long lifeStageMinTicks = AgeTrackerAccess.LifeStageMinTicks(__instance);
 
         if (BiologicalTickCorrection.CanFreeze(factor, biologicalYears, biologicalTicks, chronologicalTicks))
         {
@@ -144,7 +153,23 @@ internal static class Patch_BiologicalTicksPerTick
             return;
         }
 
-        if (!BiologicalTickCorrection.CanCorrect(factor, biologicalYears, biologicalTicks, chronologicalTicks))
+        if (BiologicalTickCorrection.CanHoldAtLifeStageFloor(
+                factor,
+                biologicalYears,
+                biologicalTicks,
+                chronologicalTicks,
+                lifeStageMinTicks))
+        {
+            __result = 0f;
+            return;
+        }
+
+        if (!BiologicalTickCorrection.CanCorrect(
+                factor,
+                biologicalYears,
+                biologicalTicks,
+                chronologicalTicks,
+                lifeStageMinTicks))
         {
             return;
         }
@@ -178,11 +203,28 @@ internal static class Patch_TickBiologicalAge
             return true;
         }
 
-        if (!BiologicalTickCorrection.CanCorrect(
-                settings.ChildAgingFactor,
-                __instance.AgeBiologicalYearsFloat,
+        long lifeStageMinTicks = AgeTrackerAccess.LifeStageMinTicks(__instance);
+        float biologicalYears = __instance.AgeBiologicalYearsFloat;
+        long chronologicalTicks = __instance.AgeChronologicalTicks;
+        int factor = settings.ChildAgingFactor;
+
+        if (BiologicalTickCorrection.CanHoldAtLifeStageFloor(
+                factor,
+                biologicalYears,
                 __instance.AgeBiologicalTicks,
-                __instance.AgeChronologicalTicks))
+                chronologicalTicks,
+                lifeStageMinTicks))
+        {
+            AgeTrackerAccess.SyncGrowthToBiologicalAge(__instance);
+            return false;
+        }
+
+        if (!BiologicalTickCorrection.CanCorrect(
+                factor,
+                biologicalYears,
+                __instance.AgeBiologicalTicks,
+                chronologicalTicks,
+                lifeStageMinTicks))
         {
             return true;
         }
@@ -198,10 +240,11 @@ internal static class Patch_TickBiologicalAge
         float progress = (float)AgeTrackerAccess.ProgressField.GetValue(__instance);
         BiologicalTickCorrection.TickResult result = BiologicalTickCorrection.Apply(
             biologicalTicks,
-            __instance.AgeChronologicalTicks,
+            chronologicalTicks,
             progress,
             interval,
-            __instance.BiologicalTicksPerTick);
+            __instance.BiologicalTicksPerTick,
+            lifeStageMinTicks);
 
         AgeTrackerAccess.BiologicalTicksField.SetValue(__instance, result.BiologicalTicks);
         AgeTrackerAccess.ProgressField.SetValue(__instance, result.Progress);
