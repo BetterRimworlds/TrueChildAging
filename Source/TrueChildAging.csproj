@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B415CF55-634E-4A79-BFFD-17B7B73C0A71}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>TrueChildAging</RootNamespace>
+    <AssemblyName>TrueChildAging</AssemblyName>
+    <LangVersion>10</LangVersion>
+    <TargetFramework>net472</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <FileAlignment>512</FileAlignment>
+<!--    <TargetFrameworkProfile />-->
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release v1.2|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <DefineConstants>RIMWORLD12</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <OutputPath>/rimworld/1.2/Mods/TrueChildAging/1.2/Assemblies</OutputPath>
+    <MainPath>/tmp/rimworld/1.2/Mods/TrueChildAging/1.2/Assemblies</MainPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release v1.3|AnyCPU' ">
+    <DefineConstants>RIMWORLD13</DefineConstants>
+    <OutputPath>/rimworld/1.3/Mods/TrueChildAging/1.3/Assemblies</OutputPath>
+    <MainPath>/rimworld/1.2/Mods/TrueChildAging/1.3/Assemblies</MainPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release v1.4|AnyCPU' ">
+    <DefineConstants>RIMWORLD14</DefineConstants>
+    <OutputPath>/rimworld/1.4/Mods/TrueChildAging/1.4/Assemblies</OutputPath>
+    <MainPath>/rimworld/1.2/Mods/TrueChildAging/1.4/Assemblies</MainPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release v1.5|AnyCPU' ">
+    <DefineConstants>RIMWORLD15</DefineConstants>
+    <OutputPath>/rimworld/1.5/Mods/TrueChildAging/1.5/Assemblies</OutputPath>
+    <MainPath>/rimworld/1.2/Mods/TrueChildAging/1.5/Assemblies</MainPath>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release v1.2|AnyCPU' ">
+    <Reference Include="Assembly-CSharp, Version=1.2.7528.19748, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\rimworld\1.2\RimWorldLinux_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\rimworld\1.2\RimWorldLinux_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\rimworld\1.2\RimWorldLinux_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release v1.3|AnyCPU' ">
+    <Reference Include="Assembly-CSharp, Version=1.3.7967.28253, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\rimworld\1.3\RimWorldLinux_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\rimworld\1.3\RimWorldLinux_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\rimworld\1.3\RimWorldLinux_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release v1.4|AnyCPU' ">
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\..\..\..\rimworld\1.4\RimWorldLinux_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\rimworld\1.4\RimWorldLinux_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\..\..\..\..\rimworld\1.4\RimWorldLinux_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Release v1.5|AnyCPU' ">
+    <Reference Include="Assembly-CSharp">
+      <HintPath>/rimworld/1.5/RimWorldLinux_Data/Managed/Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>/rimworld/1.5/RimWorldLinux_Data/Managed/UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>/rimworld/1.5/RimWorldLinux_Data/Managed/UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="BetterRandom.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="TrueChildAging.cs" />
+  </ItemGroup>
+
+
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(OS)' == 'Unix' ">
+    <PropertyGroup>
+      <FilesSource>$(ProjectDir)..\TrueChildAging</FilesSource>
+      <FilesDestination>$(OutputPath)..\..</FilesDestination>
+    </PropertyGroup>
+    <Exec Command="cp -rvf $(FilesSource)/* '$(FilesDestination)'" />
+    <Exec Command="cp -v '$(FilesSource)/../README.md' '$(FilesDestination)'" />
+    <Exec Command="mkdir -p '$(MainPath)'" />
+    <Exec Command="cp -vf $(OutputPath)* '$(MainPath)/'" />
+  </Target>
+</Project>
