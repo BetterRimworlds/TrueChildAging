@@ -9,17 +9,31 @@
  * This file is licensed under the MIT License.
  */
 
+using UnityEngine;
 using Verse;
 
 namespace BetterRimworlds.TrueChildAging;
 
 public class TrueChildAging : Mod
 {
+    public static Settings settings;
+
     public TrueChildAging(ModContentPack content) : base(content)
     {
+        settings = GetSettings<Settings>();
+
         // TODO: Implement per PLAN.md:
-        //   - Settings (int ChildAgingFactor, default 4, clamped to [-5, 5])
         //   - Harmony patches to Pawn_AgeTracker.ChildAgingMultiplier / BiologicalTicksPerTick
         //   - Save-persistent watermark GameComponent for negative (de-aging) mode
+    }
+
+    public override void DoSettingsWindowContents(Rect inRect)
+    {
+        settings.DoSettingsWindowContents(inRect);
+    }
+
+    public override string SettingsCategory()
+    {
+        return "True Child Aging";
     }
 }
