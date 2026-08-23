@@ -1,23 +1,47 @@
-# Rimworld True Child Aging
+# RimWorld True Child Aging
 
-TODO: Fill in this README. See `PLAN.md` for the intended design.
+True Child Aging replaces RimWorld's storyteller child-aging factor with an integer **Child Aging Factor** slider from **-5x to 5x**. The default is **4x**, matching vanilla Biotech.
 
-Intended feature set (from PLAN.md):
+Vanilla cannot process negative biological-tick accumulation, so this mod Harmony-patches `Pawn_AgeTracker` and uses signed fractional tick math that truncates toward zero.
 
-- An integer **Child Aging Factor** slider from -5x to +5x, defaulting to RimWorld's +4x.
-- Positive values replace the normal child-aging factor.
-- 0x freezes biological aging while the pawn remains in RimWorld's child-aging range.
-- Negative values actively correct biological age toward chronological age, but never below it
-  (requires a Harmony extension to `Pawn_AgeTracker`, since vanilla cannot process negative
-  biological-tick accumulation).
+## Modes
+
+| Setting        | Effect                                                                                                             |
+|----------------|--------------------------------------------------------------------------------------------------------------------|
+| **1x to 5x** | Children age at this speed (vanilla is 4x). From 11 to 20 they gradually slow to the adult rate. |
+| **0x**         | Freeze biological aging only while it is ahead of chronological age. When they meet, both tick **1:1**. |
+| **-1x to -5x** | Reverse biological aging while bio is ahead of chrono. When they meet, both tick **1:1**. Never below chronological age, and never below the pawn's current life stage (a child cannot become a toddler; a toddler cannot become a baby). |
+
+Freeze and reverse only apply to humanlike pawns younger than 20. Adults (biological age 20+) are never slowed, frozen, or reversed, even if their chronological age is lower. Reverse aging also stops at the current life-stage minimum: biological age will not drop a child to toddler or a toddler to baby. If chronological age is still below that floor, biological age holds until chronological age catches up.
+
+Growth vats keep vanilla behavior and are excluded from correction. During negative correction, growth-point learning continues at a positive **1x** rate.
+
+Changes apply immediately; Harmony patches stay installed and read the current setting. No restart is required.
+
+## Birthdays and growth moments
+
+When a child is walked backward, the mod records a save-persistent watermark of the highest biological age they had already reached. Birthdays, growth moments, traits, passions, work unlocks, letters, and other birthday effects at or below that watermark are suppressed so they are not awarded twice. Benefits already earned are kept. The watermark is removed after biological age advances past the previous maximum.
+
+## Requirements
+
+- RimWorld **1.4**, **1.5**, or **1.6**
+- [Harmony](https://steamcommunity.com/sharedfiles/filedetails/?id=2009463077)
+- **Biotech**
+
+Package ID: `HopeSeekr.BetterRimworlds.TrueChildAging`
 
 ## Building
 
-Requires [.NET SDK](https://dotnet.microsoft.com/) and the RimWorld game assemblies under
-`/rimworld/<version>/`. The build copies the mod into `/rimworld/<version>/Mods/TrueChildAging`.
+Requires the [.NET SDK](https://dotnet.microsoft.com/) and RimWorld game assemblies under `/rimworld/<version>/`. Assemblies are compiled per version, then the mod folder is synced into each RimWorld Mods directory.
 
 ```bash
 ./build.sh
+```
+
+Unit tests for the signed-tick helper:
+
+```bash
+dotnet test Tests/TrueChildAging.Tests.csproj
 ```
 
 ## License
