@@ -25,16 +25,23 @@ internal static class BiologicalTickCorrection
 
     public readonly struct TickResult
     {
-        public TickResult(long biologicalTicks, float progress, bool reachedChronologicalFloor)
+        public TickResult(long biologicalTicks, float progress, bool reachedFloor)
         {
             BiologicalTicks = biologicalTicks;
             Progress = progress;
-            ReachedChronologicalFloor = reachedChronologicalFloor;
+            ReachedFloor = reachedFloor;
         }
 
         public long BiologicalTicks { get; }
         public float Progress { get; }
-        public bool ReachedChronologicalFloor { get; }
+
+        /// <summary>
+        /// True when correction stopped at the effective floor: the greater of
+        /// chronological age and the current life-stage minimum age.
+        /// </summary>
+        public bool ReachedFloor { get; }
+
+        public bool ReachedChronologicalFloor => ReachedFloor;
     }
 
     public static int ClampFactor(int factor)
@@ -104,11 +111,66 @@ internal static class BiologicalTickCorrection
         int factor,
         float biologicalYears,
         long biologicalTicks,
-        long chronologicalTicks)
+        long chronologicalTicks,
+        long lifeStageMinTicks = 0)
     {
-        return IsCorrectionMode(factor)
-            && IsInChildAgingRange(biologicalYears)
-            && BiologicalAgeIsAhead(biologicalTicks, chronologicalTicks);
+        if (!IsCorrectionMode(factor)
+            || !IsInChildAgingRange(biologicalYears)
+            || !BiologicalAgeIsAhead(biologicalTicks, chronologicalTicks))
+        {
+            return false;
+        }
+
+        return biologicalTicks > EffectiveFloorTicks(chronologicalTicks, lifeStageMinTicks);
+    }
+
+    /// <summary>
+    /// Negative mode has already reached the current life-stage minimum while
+    /// biological age is still ahead of chronological age. Hold still rather
+    /// than reversing into the previous stage (child → toddler, toddler → baby)
+    /// or aging forward again at 1x.
+    /// </summary>
+    public static bool CanHoldAtLifeStageFloor(
+        int factor,
+        float biologicalYears,
+        long biologicalTicks,
+        long chronologicalTicks,
+        long lifeStageMinTicks)
+    {
+        if (!IsCorrectionMode(factor)
+            || !IsInChildAgingRange(biologicalYears)
+            || !BiologicalAgeIsAhead(biologicalTicks, chronologicalTicks))
+        {
+            return false;
+        }
+
+        return biologicalTicks <= EffectiveFloorTicks(chronologicalTicks, lifeStageMinTicks);
+    }
+
+    /// <summary>
+    /// Ticks at the start of a life stage. Reverse aging must not cross below
+    /// this value, or <c>RecalculateLifeStageIndex</c> would drop the pawn into
+    /// the previous stage.
+    /// </summary>
+    public static long LifeStageFloorTicks(float minAgeYears)
+    {
+        if (minAgeYears <= 0f)
+        {
+            return 0L;
+        }
+
+        double ticks = (double)minAgeYears * TicksPerYear;
+        if (ticks >= long.MaxValue)
+        {
+            return long.MaxValue;
+        }
+
+        return (long)Math.Ceiling(ticks);
+    }
+
+    public static long EffectiveFloorTicks(long chronologicalTicks, long lifeStageMinTicks)
+    {
+        return lifeStageMinTicks > chronologicalTicks ? lifeStageMinTicks : chronologicalTicks;
     }
 
     public static float SignedBiologicalRate(int factor, float geneMultiplier)
@@ -125,10 +187,17 @@ internal static class BiologicalTickCorrection
         int factor,
         float biologicalYears,
         long biologicalTicks,
-        long chronologicalTicks)
+        long chronologicalTicks,
+        long lifeStageMinTicks = 0)
     {
         return CanFreeze(factor, biologicalYears, biologicalTicks, chronologicalTicks)
-            || CanCorrect(factor, biologicalYears, biologicalTicks, chronologicalTicks);
+            || CanCorrect(factor, biologicalYears, biologicalTicks, chronologicalTicks, lifeStageMinTicks)
+            || CanHoldAtLifeStageFloor(
+                factor,
+                biologicalYears,
+                biologicalTicks,
+                chronologicalTicks,
+                lifeStageMinTicks);
     }
 
     /// <summary>
@@ -190,14 +259,16 @@ internal static class BiologicalTickCorrection
         long chronologicalTicks,
         float progress,
         int interval,
-        float rate)
+        float rate,
+        long lifeStageMinTicks = 0)
     {
         if (interval < 0)
         {
             interval = 0;
         }
 
-        if (biologicalTicks <= chronologicalTicks)
+        long floorTicks = EffectiveFloorTicks(chronologicalTicks, lifeStageMinTicks);
+        if (biologicalTicks <= floorTicks)
         {
             return new TickResult(biologicalTicks, progress, true);
         }
@@ -211,9 +282,9 @@ internal static class BiologicalTickCorrection
 
         long newBiologicalTicks = biologicalTicks + wholeTicks;
         bool reachedFloor = false;
-        if (newBiologicalTicks <= chronologicalTicks)
+        if (newBiologicalTicks <= floorTicks)
         {
-            newBiologicalTicks = chronologicalTicks;
+            newBiologicalTicks = floorTicks;
             progress = 0f;
             reachedFloor = true;
         }
