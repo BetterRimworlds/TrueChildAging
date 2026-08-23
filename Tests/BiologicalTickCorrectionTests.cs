@@ -251,4 +251,117 @@ public class BiologicalTickCorrectionTests
         Assert.IsFalse(BiologicalTickCorrection.ShouldSyncGrowthToBiologicalAge(4, 12f, bio, chrono));
         Assert.IsFalse(BiologicalTickCorrection.ShouldSyncGrowthToBiologicalAge(-4, 20f, 21 * Year, chrono));
     }
+
+    [Test]
+    public void LifeStageFloorTicks_UsesStageMinAge()
+    {
+        Assert.AreEqual(0L, BiologicalTickCorrection.LifeStageFloorTicks(0f));
+        Assert.AreEqual(0L, BiologicalTickCorrection.LifeStageFloorTicks(-1f));
+        Assert.AreEqual(Year, BiologicalTickCorrection.LifeStageFloorTicks(1f));
+        Assert.AreEqual(3 * Year, BiologicalTickCorrection.LifeStageFloorTicks(3f));
+        Assert.AreEqual((long)(0.5 * Year), BiologicalTickCorrection.LifeStageFloorTicks(0.5f));
+    }
+
+    [Test]
+    public void EffectiveFloor_IsMaxOfChronologicalAndLifeStage()
+    {
+        Assert.AreEqual(4 * Year, BiologicalTickCorrection.EffectiveFloorTicks(4 * Year, 3 * Year));
+        Assert.AreEqual(3 * Year, BiologicalTickCorrection.EffectiveFloorTicks(1 * Year, 3 * Year));
+        Assert.AreEqual(0L, BiologicalTickCorrection.EffectiveFloorTicks(0L, 0L));
+    }
+
+    [Test]
+    public void ChildCannotRegressToToddler()
+    {
+        const float childMinAge = 3f;
+        long childFloor = BiologicalTickCorrection.LifeStageFloorTicks(childMinAge);
+        long bio = 5 * Year;
+        long chrono = 1 * Year;
+
+        Assert.IsTrue(BiologicalTickCorrection.CanCorrect(-4, 5f, bio, chrono, childFloor));
+
+        BiologicalTickCorrection.TickResult result = BiologicalTickCorrection.Apply(
+            biologicalTicks: bio,
+            chronologicalTicks: chrono,
+            progress: 0f,
+            interval: (int)(3 * Year),
+            rate: -1f,
+            lifeStageMinTicks: childFloor);
+
+        Assert.AreEqual(childFloor, result.BiologicalTicks);
+        Assert.AreEqual(0f, result.Progress);
+        Assert.IsTrue(result.ReachedFloor);
+        Assert.IsFalse(BiologicalTickCorrection.CanCorrect(-4, 3f, result.BiologicalTicks, chrono, childFloor));
+        Assert.IsTrue(BiologicalTickCorrection.CanHoldAtLifeStageFloor(
+            -4, 3f, result.BiologicalTicks, chrono, childFloor));
+    }
+
+    [Test]
+    public void ToddlerCannotRegressToBaby()
+    {
+        const float toddlerMinAge = 1f;
+        long toddlerFloor = BiologicalTickCorrection.LifeStageFloorTicks(toddlerMinAge);
+        long bio = (long)(2.4 * Year);
+        long chrono = 0;
+
+        BiologicalTickCorrection.TickResult result = BiologicalTickCorrection.Apply(
+            biologicalTicks: bio,
+            chronologicalTicks: chrono,
+            progress: -0.8f,
+            interval: (int)(2 * Year),
+            rate: -5f,
+            lifeStageMinTicks: toddlerFloor);
+
+        Assert.AreEqual(toddlerFloor, result.BiologicalTicks);
+        Assert.AreEqual(0f, result.Progress, "Remainder must be cleared at the life-stage floor.");
+        Assert.IsTrue(result.ReachedFloor);
+        Assert.IsTrue(BiologicalTickCorrection.CanHoldAtLifeStageFloor(
+            -2, 1f, result.BiologicalTicks, chrono, toddlerFloor));
+        Assert.IsFalse(BiologicalTickCorrection.CanCorrect(-2, 1f, result.BiologicalTicks, chrono, toddlerFloor));
+    }
+
+    [Test]
+    public void ChronologicalFloorStillWinsWhenItIsHigherThanLifeStageMin()
+    {
+        long childFloor = BiologicalTickCorrection.LifeStageFloorTicks(3f);
+        BiologicalTickCorrection.TickResult result = BiologicalTickCorrection.Apply(
+            biologicalTicks: 6 * Year,
+            chronologicalTicks: 4 * Year,
+            progress: 0f,
+            interval: (int)(4 * Year),
+            rate: -1f,
+            lifeStageMinTicks: childFloor);
+
+        Assert.AreEqual(4 * Year, result.BiologicalTicks);
+        Assert.IsTrue(result.ReachedFloor);
+        Assert.IsFalse(BiologicalTickCorrection.CanHoldAtLifeStageFloor(
+            -3, 4f, 4 * Year, 4 * Year, childFloor));
+    }
+
+    [Test]
+    public void BabyStageHasNoLifeStageFloorAboveZero()
+    {
+        long babyFloor = BiologicalTickCorrection.LifeStageFloorTicks(0f);
+        BiologicalTickCorrection.TickResult result = BiologicalTickCorrection.Apply(
+            biologicalTicks: 2 * Year,
+            chronologicalTicks: Year / 2,
+            progress: 0f,
+            interval: (int)(3 * Year),
+            rate: -1f,
+            lifeStageMinTicks: babyFloor);
+
+        Assert.AreEqual(Year / 2, result.BiologicalTicks);
+        Assert.IsFalse(BiologicalTickCorrection.CanHoldAtLifeStageFloor(
+            -1, 0.5f, Year / 2, Year / 2, babyFloor));
+    }
+
+    [Test]
+    public void HoldingAtLifeStageFloor_StillSyncsGrowth()
+    {
+        long childFloor = 3 * Year;
+        Assert.IsTrue(BiologicalTickCorrection.ShouldSyncGrowthToBiologicalAge(
+            -4, 3f, childFloor, Year, childFloor));
+        Assert.IsFalse(BiologicalTickCorrection.ShouldSyncGrowthToBiologicalAge(
+            4, 3f, childFloor, Year, childFloor));
+    }
 }
