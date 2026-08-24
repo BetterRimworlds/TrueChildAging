@@ -11,10 +11,8 @@
 
 namespace BetterRimworlds.TrueChildAging;
 
-/// <summary>
 /// Signed biological-tick math used by the Harmony patches. Isolated so it can
 /// be unit-tested without RimWorld pawn objects.
-/// </summary>
 internal static class BiologicalTickCorrection
 {
     public const int MinFactor = -5;
@@ -35,10 +33,8 @@ internal static class BiologicalTickCorrection
         public long BiologicalTicks { get; }
         public float Progress { get; }
 
-        /// <summary>
         /// True when correction stopped at the effective floor: the greater of
         /// chronological age and the current life-stage minimum age.
-        /// </summary>
         public bool ReachedFloor { get; }
 
         public bool ReachedChronologicalFloor => ReachedFloor;
@@ -59,12 +55,10 @@ internal static class BiologicalTickCorrection
         return factor;
     }
 
-    /// <summary>
     /// Value exposed through <c>ChildAgingMultiplier</c>. Zero and negative
     /// modes report 1x so that, once biological age is no longer ahead of
     /// chronological age, aging and growth-point learning tick 1:1. Freeze and
     /// reverse are applied only in the biological-tick path while bio is ahead.
-    /// </summary>
     public static float ChildAgingMultiplierForConsumers(int factor)
     {
         factor = ClampFactor(factor);
@@ -91,11 +85,9 @@ internal static class BiologicalTickCorrection
         return biologicalTicks > chronologicalTicks;
     }
 
-    /// <summary>
     /// 0x holds biological age still only while it is ahead of chronological
     /// age. Once they meet, the child factor is 1x (true 1:1, plus vanilla
     /// gene / adult-interpolation modifiers).
-    /// </summary>
     public static bool CanFreeze(
         int factor,
         float biologicalYears,
@@ -124,12 +116,10 @@ internal static class BiologicalTickCorrection
         return biologicalTicks > EffectiveFloorTicks(chronologicalTicks, lifeStageMinTicks);
     }
 
-    /// <summary>
     /// Negative mode has already reached the current life-stage minimum while
     /// biological age is still ahead of chronological age. Hold still rather
     /// than reversing into the previous stage (child → toddler, toddler → baby)
     /// or aging forward again at 1x.
-    /// </summary>
     public static bool CanHoldAtLifeStageFloor(
         int factor,
         float biologicalYears,
@@ -147,11 +137,9 @@ internal static class BiologicalTickCorrection
         return biologicalTicks <= EffectiveFloorTicks(chronologicalTicks, lifeStageMinTicks);
     }
 
-    /// <summary>
     /// Ticks at the start of a life stage. Reverse aging must not cross below
     /// this value, or <c>RecalculateLifeStageIndex</c> would drop the pawn into
     /// the previous stage.
-    /// </summary>
     public static long LifeStageFloorTicks(float minAgeYears)
     {
         if (minAgeYears <= 0f)
@@ -178,11 +166,9 @@ internal static class BiologicalTickCorrection
         return ClampFactor(factor) * geneMultiplier;
     }
 
-    /// <summary>
     /// True while freeze or reverse is holding/correcting biological age.
     /// Vanilla <c>CalculateGrowth</c> still adds wall-clock progress in those
     /// modes, which is what the age tooltip's <c>growth</c> value shows.
-    /// </summary>
     public static bool ShouldSyncGrowthToBiologicalAge(
         int factor,
         float biologicalYears,
@@ -200,10 +186,8 @@ internal static class BiologicalTickCorrection
                 lifeStageMinTicks);
     }
 
-    /// <summary>
     /// Matches vanilla <c>CalculateInitialGrowth</c>: fraction of adult min age,
     /// clamped to [0, 1].
-    /// </summary>
     public static float GrowthFromBiologicalTicks(long biologicalTicks, float adultMinAge)
     {
         if (adultMinAge <= 0f)
@@ -245,10 +229,8 @@ internal static class BiologicalTickCorrection
         return candidateTicks > existingWatermark ? candidateTicks : existingWatermark;
     }
 
-    /// <summary>
     /// Truncates toward zero. Vanilla <c>FloorToInt</c> is unsafe for negative
     /// accumulation (it rounds toward -∞).
-    /// </summary>
     public static int TruncateTowardZero(float value)
     {
         return (int)value;

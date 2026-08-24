@@ -16,7 +16,11 @@ Replaces RimWorld's child-aging factor with an integer slider from -5x to 5x (de
 0x: freeze biological aging only while it is ahead of chronological age; when they meet, both tick 1:1.
 -1x to -5x: reverse biological aging toward chronological age; when they meet, both tick 1:1.
 
-Requires Harmony and Biotech. Changes apply immediately; no restart needed.
+Optional 9 Month Pregnancies (On/Off): 
+* When On, human pregnancies last 45 days (9 RimWorld months) plus or minus 6 days. 
+* When Off, human pregnancies use vanilla 18 days. The current setting applies immediately to any future pregnancy.
+
+Requires Harmony and Biotech. No restart needed.
 </description>
     <modDependencies>
         <li>

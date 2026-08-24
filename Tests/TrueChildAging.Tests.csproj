@@ -12,6 +12,8 @@
 
   <ItemGroup>
     <Compile Include="..\Source\BiologicalTickCorrection.cs" Link="BiologicalTickCorrection.cs" />
+    <Compile Include="..\Source\BetterRandom.cs" Link="BetterRandom.cs" />
+    <Compile Include="..\Source\NineMonthPregnancy.cs" Link="NineMonthPregnancy.cs" />
   </ItemGroup>
 
   <ItemGroup>

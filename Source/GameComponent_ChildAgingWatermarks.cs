@@ -14,11 +14,9 @@ using Verse;
 
 namespace BetterRimworlds.TrueChildAging;
 
-/// <summary>
 /// Save-persistent record of each correcting pawn's highest previously reached
 /// biological-age tick. Used to suppress duplicate birthdays and growth moments
 /// while biological age is walked back toward chronological age.
-/// </summary>
 public class GameComponent_ChildAgingWatermarks : GameComponent
 {
     private Dictionary<Pawn, long> watermarks = new Dictionary<Pawn, long>();
