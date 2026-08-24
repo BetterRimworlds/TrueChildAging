@@ -10,26 +10,24 @@ dotnet restore "$solutionPath"
 dotnet test Tests/TrueChildAging.Tests.csproj --nologo
 
 function sync_mod() {
-    rsync -a "${MOD}" /rimworld/1.2/Mods/
+    rsync -a "${MOD}" /rimworld/1.4/Mods/
 
-    cp README.md /rimworld/1.2/Mods/${MOD}
+    cp README.md /rimworld/1.4/Mods/${MOD}
     if command -v unix2dos >/dev/null 2>&1; then
-        unix2dos /rimworld/1.2/Mods/${MOD}/README.md
+        unix2dos /rimworld/1.4/Mods/${MOD}/README.md
     fi
 
-    rm -rf /rimworld/1.4/Mods/${MOD}
     rm -rf /rimworld/1.5/Mods/${MOD}
     rm -rf /rimworld/1.6/Mods/${MOD}
     rm -rf /rimworld/1.6-steam/Mods/${MOD}
 
-    cp -af /rimworld/1.2/Mods/${MOD} /rimworld/1.4/Mods
-    cp -af /rimworld/1.2/Mods/${MOD} /rimworld/1.5/Mods
-    cp -af /rimworld/1.2/Mods/${MOD} /rimworld/1.6/Mods
-    cp -af /rimworld/1.2/Mods/${MOD} /rimworld/1.6-steam/Mods
+    cp -af /rimworld/1.4/Mods/${MOD} /rimworld/1.5/Mods
+    cp -af /rimworld/1.4/Mods/${MOD} /rimworld/1.6/Mods
+    cp -af /rimworld/1.4/Mods/${MOD} /rimworld/1.6-steam/Mods
 }
 
 function build() {
-    rm -rf /rimworld/1.2/Mods/${MOD}
+    rm -rf /rimworld/1.4/Mods/${MOD}
 
     local pids=()
     for config in "${configurations[@]}"; do
