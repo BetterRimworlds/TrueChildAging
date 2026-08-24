@@ -18,6 +18,13 @@ Growth vats keep vanilla behavior and are excluded from correction. During negat
 
 Changes apply immediately; Harmony patches stay installed and read the current setting. No restart is required.
 
+## 9 Month Pregnancies
+
+Optional 9 Month Pregnancies (On/Off): 
+
+* When On, human pregnancies last 45 days (9 RimWorld months) plus or minus 6 days. 
+* When Off, human pregnancies use vanilla 18 days. The current setting applies immediately to any future pregnancy.
+
 ## Birthdays and growth moments
 
 When a child is walked backward, the mod records a save-persistent watermark of the highest biological age they had already reached. Birthdays, growth moments, traits, passions, work unlocks, letters, and other birthday effects at or below that watermark are suppressed so they are not awarded twice. Benefits already earned are kept. The watermark is removed after biological age advances past the previous maximum.

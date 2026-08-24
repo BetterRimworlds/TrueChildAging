@@ -21,10 +21,12 @@ public class Settings : ModSettings
     public const int DefaultChildAgingFactor = 4;
 
     public int ChildAgingFactor = DefaultChildAgingFactor;
+    public bool NineMonthPregnancies = false;
 
     public override void ExposeData()
     {
         Scribe_Values.Look(ref ChildAgingFactor, "ChildAgingFactor", DefaultChildAgingFactor);
+        Scribe_Values.Look(ref NineMonthPregnancies, "NineMonthPregnancies", false);
         ChildAgingFactor = Mathf.Clamp(ChildAgingFactor, MinChildAgingFactor, MaxChildAgingFactor);
     }
 
@@ -59,6 +61,20 @@ public class Settings : ModSettings
         listing.Label("During correction, growth-point learning continues at a positive 1x rate.");
         listing.Label("Changes apply immediately; no restart required.");
 
+        listing.GapLine(12f);
+        if (listing.ButtonTextLabeled(
+                "9 Month Pregnancies",
+                NineMonthPregnancies ? "On" : "Off",
+                TextAnchor.MiddleLeft,
+                null,
+                NineMonthTooltip))
+        {
+            NineMonthPregnancies = !NineMonthPregnancies;
+        }
+
+        listing.Gap(4f);
+        listing.Label("On: human pregnancies last 45 days (9 RimWorld months) plus or minus 6 days. Off: vanilla 18-day human pregnancies. Each pregnancy rolls its own duration. The current setting is applied immediately, to all future pregnancies.");
+
         listing.End();
     }
 
@@ -69,4 +85,10 @@ public class Settings : ModSettings
         "0x: Freezes biological aging while it is ahead of chronological age; when they meet, both tick 1:1.\n" +
         "-1x to -5x: Reverses biological aging toward chronological age; when they meet, both tick 1:1. Never below chronological age or the current life stage (a child cannot regress to toddler or baby).\n\n" +
         "Changes apply immediately; no restart required.";
+
+    private const string NineMonthTooltip =
+        "9 Month Pregnancies\n" +
+        "On: extend human pregnancies to 45 days (9 RimWorld months) plus or minus 6 days.\n" +
+        "Off: vanilla 18-day human pregnancies.\n\n" +
+        "Each pregnancy rolls its own duration. The current setting is applied immediately; no restart required.";
 }
