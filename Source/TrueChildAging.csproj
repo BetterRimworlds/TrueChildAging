@@ -20,9 +20,6 @@
     <!-- Only dependency is the reference-assemblies package; skip NuGet's
          vulnerability audit so restore works on read-only caches (NU1900). -->
     <NuGetAudit>false</NuGetAudit>
-
-    <!-- Preserve your existing output root. -->
-    <ModOutputRoot>/rimworld/1.2/Mods/TrueChildAging</ModOutputRoot>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release v1.2' ">
@@ -53,10 +50,6 @@
     <RimWorldVersion>1.6</RimWorldVersion>
     <RimWorldInstall>/rimworld/1.6-steam</RimWorldInstall>
     <DefineConstants>RIMWORLD16</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(RimWorldVersion)' != '' ">
-    <OutputPath>$(ModOutputRoot)/$(RimWorldVersion)/Assemblies</OutputPath>
   </PropertyGroup>
 
   <Target Name="FailOnUnsupportedConfiguration" BeforeTargets="BeforeBuild" Condition=" '$(RimWorldVersion)' == '' ">

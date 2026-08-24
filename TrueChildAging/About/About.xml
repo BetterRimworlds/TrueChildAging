@@ -3,17 +3,35 @@
     <name>True Child Aging</name>
     <packageId>HopeSeekr.BetterRimworlds.TrueChildAging</packageId>
     <supportedVersions>
-        <li>1.2</li>
-        <li>1.3</li>
         <li>1.4</li>
         <li>1.5</li>
         <li>1.6</li>
     </supportedVersions>
     <author>HopeSeekr</author>
     <url>https://github.com/BetterRimworlds/TrueChildAging/</url>
-    <description>Version 0.1 (scaffold)
-TODO: Fill in the mod description. See PLAN.md for the intended design:
-an adjustable Child Aging Factor slider (+/-) that replaces or reverses RimWorld's
-child-aging rate, implemented via Harmony patches to Pawn_AgeTracker.
+    <description>Version 1.0.0
+Replaces RimWorld's child-aging factor with an integer slider from -5x to 5x (default 4x, matching vanilla).
+
+1x to 5x: children age at this speed (vanilla is 4x). From 11 to 20 they gradually slow to the adult rate.
+0x: freeze biological aging only while it is ahead of chronological age; when they meet, both tick 1:1.
+-1x to -5x: reverse biological aging toward chronological age; when they meet, both tick 1:1.
+
+Requires Harmony and Biotech. Changes apply immediately; no restart needed.
 </description>
+    <modDependencies>
+        <li>
+            <packageId>brrainz.harmony</packageId>
+            <displayName>Harmony</displayName>
+            <steamWorkshopUrl>steam://url/CommunityFilePage/2009463077</steamWorkshopUrl>
+            <downloadUrl>https://github.com/pardeike/HarmonyRimWorld/releases/latest</downloadUrl>
+        </li>
+        <li>
+            <packageId>Ludeon.RimWorld.Biotech</packageId>
+            <displayName>Biotech</displayName>
+        </li>
+    </modDependencies>
+    <loadAfter>
+        <li>brrainz.harmony</li>
+        <li>Ludeon.RimWorld.Biotech</li>
+    </loadAfter>
 </ModMetaData>
