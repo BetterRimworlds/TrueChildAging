@@ -22,19 +22,7 @@
     <NuGetAudit>false</NuGetAudit>
 
     <!-- Preserve your existing output root. -->
-    <ModOutputRoot>/rimworld/1.2/Mods/TrueChildAging</ModOutputRoot>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release v1.2' ">
-    <RimWorldVersion>1.2</RimWorldVersion>
-    <RimWorldInstall>/rimworld/1.2</RimWorldInstall>
-    <DefineConstants>RIMWORLD12</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release v1.3' ">
-    <RimWorldVersion>1.3</RimWorldVersion>
-    <RimWorldInstall>/rimworld/1.3</RimWorldInstall>
-    <DefineConstants>RIMWORLD13</DefineConstants>
+    <ModOutputRoot>/rimworld/1.4/Mods/TrueChildAging</ModOutputRoot>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release v1.4' ">

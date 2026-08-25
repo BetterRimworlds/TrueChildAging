@@ -2,8 +2,8 @@
 
   ## Summary
 
-  Create True Child Aging as an independent RimWorld mod and repository. It will provide an integer Child Aging Factor slider from -5x to +5x, defaulting to RimWorld’s
-  +4x.
+  Create True Child Aging as an independent RimWorld mod and repository. It will provide an integer Child Aging Factor slider from -5x to 5x, defaulting to RimWorld’s
+  4x.
 
   Positive values replace the normal child-aging factor. Negative values actively correct biological age toward chronological age, but never below it. Vanilla cannot
   process negative biological-tick accumulation, so this requires a dedicated Harmony extension to Pawn_AgeTracker. Aging implementation
@@ -27,15 +27,16 @@
   ## Settings and Behavior
 
   - Persist int ChildAgingFactor under the key ChildAgingFactor, default 4, clamped to [-5, 5].
-  - Render an integer-snapping slider with a signed label such as Child Aging Factor: +4x.
+  - Render an integer-snapping slider with a label such as Child Aging Factor: 4x.
   - Apply changes immediately; no restart is required because Harmony patches remain installed and read the current setting.
   - Explain the modes in the tooltip and README:
-      - +1x..+5x: replace RimWorld’s child-aging factor.
-      - 0x: freeze biological aging while the pawn remains in RimWorld’s child-aging range.
+      - 1x..5x: replace RimWorld’s child-aging factor.
+      - 0x: freeze biological aging only while it is ahead of chronological age; when they meet, both tick 1:1.
       - -1x..-5x: reverse biological aging at that rate only while biological age exceeds chronological age.
 
   - Positive values retain RimWorld’s normal transition from child aging toward adult aging.
   - Negative correction is limited to humanlike pawns whose biological age remains within RimWorld’s child-aging range, including its transition period up to age 20.
+  - Reverse aging cannot cross the pawn’s current life-stage minimum (child cannot become toddler; toddler cannot become baby).
   - Do not correct biologically adult pawns aged 20 or above, even when their chronological age is lower.
   - Growth vats retain vanilla behavior and are excluded from correction.
   - During correction, growth-point learning continues at a positive 1x rate.
@@ -50,14 +51,21 @@
       - For an eligible pawn in negative mode with biological age ahead of chronological age, return the configured signed correction rate, retaining applicable gene
         multipliers.
 
-      - At or below the boundary, leave the effective child factor at vanilla 1x; other vanilla modifiers remain active.
+      - At or below the chronological boundary, leave the effective child factor at vanilla 1x; other vanilla
+        modifiers remain active.
+      - If the pawn is sitting on the current life-stage minimum while still ahead of chronological age, return 0x
+        so they cannot reverse into the previous stage and do not resume 1x aging until chronological age catches up.
       - If modifiers subsequently place biological age ahead again, correction may resume.
 
   - Prefix the private biological-tick routine while correction is active:
       - Support signed fractional accumulation using truncation toward zero for negative whole ticks.
-      - Clamp the resulting biological age to the pawn’s current chronological age.
+      - Clamp the resulting biological age to the greater of chronological age and the
+        current life-stage minimum age.
       - Clear the fractional correction remainder when the boundary is reached.
       - Never alter chronological age or allow biological age to cross below it.
+      - Never reverse across a life-stage boundary (child cannot become toddler; toddler
+        cannot become baby). If chronological age is still below that floor, hold
+        biological age until chronological age catches up, then tick 1:1.
 
   - Isolate the signed-tick and boundary calculation in an internal pure helper so it can be unit tested without RimWorld pawn objects.
   - Add a save-persistent GameComponent recording each correcting pawn and their highest previously reached biological-age tick:
@@ -76,16 +84,19 @@
       - All integer settings from -5 through +5.
       - Signed fractional accumulation across repeated and large intervals.
       - Exact-boundary arrival and attempted undershoot.
+      - Life-stage floor: child cannot regress to toddler; toddler cannot regress to baby.
+      - Combined floor is the greater of chronological age and current life-stage min age.
       - Biological age already equal to or below chronological age.
       - Gene-adjusted negative rates.
       - Age-20 eligibility cutoff.
 
   - Build and test the 1.4, 1.5, and 1.6 configurations independently.
   - In-game verification:
-      - Default +4x matches vanilla.
+      - Default 4x matches vanilla.
       - Positive settings preserve vanilla child-to-adult interpolation.
       - 0x freezes eligible biological aging.
-      - Negative settings correct at the selected rate and stop exactly at chronological age.
+      - Negative settings correct at the selected rate and stop exactly at chronological age,
+        without crossing the current life-stage minimum.
       - Biologically adult pawns are not corrected.
       - Growth vats remain unchanged.
       - Learning remains positive at 1x during correction.
@@ -98,6 +109,7 @@
   - The standalone mod intentionally overrides the storyteller’s child-aging setting.
   - “Biological children only” means RimWorld’s complete child-aging influence range, ending at biological age 20.
   - Negative mode corrects biological age rather than waiting for chronological age to catch up through cryptosleep.
-  - Vanilla gene and aging modifiers remain meaningful, except that the chronological-age floor is absolute.
+  - Vanilla gene and aging modifiers remain meaningful, except that the chronological-age
+    floor and the current life-stage minimum are absolute reverse limits.
 
 
