@@ -134,7 +134,7 @@ internal static class Patch_Hediff_PostMake
     }
 }
 
-#if RIMWORLD16
+#if RIMWORLD16 || RIMWORLD17
 [HarmonyPatch(typeof(Hediff_Pregnant), "TickInterval")]
 #else
 [HarmonyPatch(typeof(Hediff_Pregnant), "Tick")]
